@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 차 연료 건강검진</title>
+<style>
+@font-face{font-family:'Sejong';src:url('./assets/sejong.ttf') format('truetype');font-weight:400;font-style:normal}
+:root{
+  --bg:#ffffff; --bg2:#f7f8fb; --line:#e7eaf0; --ink:#223047; --muted:#6e7787;
+  --primary:#667892; --primary-dark:#3f5067; --accent:#bea07a; --soft:#eff2f7; --soft-accent:#f7f1ea;
+  --blue-lite:#edf2f8; --warn:#b98543; --danger:#b66262;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 'Sejong','Malgun Gothic',system-ui,sans-serif}
+a{text-decoration:none;color:inherit}
+button,input,select,textarea,option,svg text{font-family:'Sejong','Malgun Gothic',sans-serif!important} button,input,select{font-size:inherit} body,body *{font-synthesis:none} body{font-weight:400}
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar{max-width:1240px;margin:auto;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;font-size:31px;font-weight:700;letter-spacing:-1.3px}
+.mark{width:34px;height:34px;border-radius:11px;background:var(--soft);display:grid;place-items:center;color:var(--primary-dark);font-size:18px;border:1px solid var(--line)}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+nav button,.ghost-btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px 14px;border-radius:12px;cursor:pointer}
+nav button.active{background:var(--primary-dark);color:#fff;border-color:var(--primary-dark)}
+main{max-width:1240px;margin:auto;padding:26px 22px 70px}
+section{scroll-margin-top:90px}
+.section-kicker{font-size:14px;color:var(--primary);margin-bottom:8px}
+.section-title{font-size:28px;line-height:1.35;letter-spacing:-1.1px;margin:0 0 10px}
+.section-desc{color:var(--muted);margin:0 0 20px}
+.analysis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:8px}
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 8px 28px rgba(53,72,99,.04);min-width:0}
+.card .mini{font-size:14px;color:var(--primary)}
+.card h3{font-size:18px;line-height:1.45;margin:8px 0 6px;letter-spacing:-.4px}
+.card p{margin:0;color:var(--muted)}
+.chart{margin-top:18px;min-height:220px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:999px;vertical-align:-2px;margin-right:5px}
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:center;padding:28px 0 8px}
+.hero-copy{padding:8px 2px}
+.hero-title{font-size:64px;line-height:1.18;letter-spacing:-2.4px;margin:8px 0 16px}
+.hero-title .accent{color:var(--primary)}
+.hero p{font-size:19px;color:var(--muted);margin:0 0 6px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.primary-btn{background:var(--primary-dark);color:#fff;border:1px solid var(--primary-dark);padding:14px 18px;border-radius:15px;cursor:pointer}
+.secondary-btn{background:#fff;color:var(--ink);border:1px solid var(--line);padding:14px 18px;border-radius:15px;cursor:pointer}
+.hero-carwrap{text-align:center}
+.car-cta{display:inline-block;width:min(100%,420px);background:linear-gradient(180deg,#fff, #fafbfc);border:1px solid var(--line);border-radius:28px;padding:22px 20px 18px;box-shadow:0 20px 40px rgba(62,84,110,.06);cursor:pointer;transition:.18s transform ease,.18s box-shadow ease}
+.car-cta:hover{transform:translateY(-2px);box-shadow:0 25px 45px rgba(62,84,110,.1)}
+.car-caption{margin-top:8px;font-size:17px;color:var(--primary-dark)}
+.hero-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:18px}
+.stat-card{padding:18px 20px;background:#fff;border:1px solid var(--line);border-radius:18px}
+.stat-label{color:var(--muted);font-size:14px}.stat-value{font-size:26px;line-height:1.15;letter-spacing:-1px;margin-top:8px;font-weight:700}
+.feature-grid,.data-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.feature-card h4,.data-card h4{font-size:18px;margin:0 0 8px}
+.feature-card p,.data-card p{color:var(--muted);margin:0}
+.data-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.flow-step{padding:16px;border-radius:16px;background:var(--bg2);border:1px solid var(--line)}
+.flow-step b{display:block;margin-bottom:6px;color:var(--primary-dark)}
+.panel-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.panel-tabs button{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:12px;cursor:pointer}
+.panel-tabs button.active{background:var(--primary-dark);color:#fff;border-color:var(--primary-dark)}
+.page[hidden]{display:none!important}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:13px;color:var(--primary-dark);margin-bottom:4px}
+input,select{display:block;width:100%;padding:11px 12px;border:1px solid #d4dae3;border-radius:12px;background:#fff;color:var(--ink);outline:none}
+input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(102,120,146,.10)}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.tablewrap{overflow:auto;max-height:480px;border:1px solid var(--line);border-radius:16px}
+table{border-collapse:collapse;width:100%;font-size:13px;background:#fff}th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{background:#f7f8fb}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;font-size:13px;border:1px solid var(--line)}
+.badge.good{background:#f3f5f8;color:var(--primary-dark)}
+.badge.warn{background:#faf4eb;color:#9a6d35}
+.badge.danger{background:#fbefef;color:#9d5353}
+.info-note{padding:16px 18px;border-radius:16px;background:var(--soft-accent);border:1px solid #eedfca;color:#826848}
+.report-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:16px}
+.progress-list div{margin:12px 0}.barline{height:10px;border-radius:999px;background:#edf0f4;overflow:hidden;margin-top:6px}.barline i{display:block;height:100%;background:linear-gradient(90deg,var(--accent), var(--primary))}
+.mapbox{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px}.footer{margin-top:38px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:18px}
+@media (max-width:1080px){.hero,.analysis-grid,.two-col,.feature-grid,.data-grid,.hero-stats,.report-stats{grid-template-columns:1fr 1fr}.data-flow{grid-template-columns:1fr 1fr}}
+@media (max-width:760px){.bar{display:block}.brand{margin-bottom:12px}.hero,.analysis-grid,.two-col,.feature-grid,.data-grid,.hero-stats,.report-stats,.fields,.data-flow{grid-template-columns:1fr}.hero-title{font-size:46px}.section-title{font-size:25px}.card{padding:20px}}
+
+:root{--ink:#20283b;--muted:#687185;--primary:#315bc3;--primary-dark:#315bc3;--accent:#e2a35d;--soft:#eef3ff;--soft-accent:#fff8ef;--bg2:#f7f9fd;--line:#e5e9f1;--blue-lite:#eef3ff}
+[hidden]{display:none!important}body{font-size:15px;background:#fff}body,body *{font-synthesis:weight} .bar{max-width:1180px;padding:18px 24px}.brand{font-size:25px;font-weight:700;letter-spacing:-.8px;cursor:default}nav button{border:none;background:transparent;padding:9px 12px;border-radius:8px}nav button.active{background:#eef3ff;color:#315bc3;font-weight:700}nav button:hover{background:#f1f4fa}main{max-width:1180px;padding:0 24px 64px}.hero{grid-template-columns:1.25fr .75fr;gap:36px;padding:52px 0 38px;align-items:center}.hero-title{font-size:clamp(32px,4.4vw,53px);font-weight:700;letter-spacing:-1.7px;line-height:1.24;margin:12px 0 17px}.hero p{font-size:17px;line-height:1.65}.hero-copy{padding:0}.car-cta{border:0;background:none;box-shadow:none;padding:8px 0;width:100%;max-width:390px;color:var(--ink)}.car-cta:hover{box-shadow:none;transform:translateY(-4px)}.car-caption{display:block;font-size:20px;font-weight:700;color:var(--primary);margin:0 auto 5px}.car-caption span{display:inline-block;margin-left:8px}.car-cta small{color:var(--muted);font-size:13px}.car-search{display:flex;align-items:center;gap:12px;border:1.5px solid #8faaf0;border-radius:13px;padding:7px 8px 7px 15px;max-width:580px;margin-top:24px;color:var(--primary);box-shadow:0 5px 18px #315bc30a}.car-search input{border:0;padding:9px 0;flex:1;min-width:0;outline:none;box-shadow:none!important}.car-search button{flex-shrink:0;padding:10px 25px}.quick-search{display:flex;gap:8px;align-items:center;margin:11px 0;color:var(--muted);font-size:13px}.quick-search button{border:0;background:#f3f5f9;color:#48546b;border-radius:6px;padding:4px 11px;cursor:pointer}.text-link{border:0;background:none;padding:5px 0;color:var(--primary);cursor:pointer;font-weight:700}.home-section{margin-top:48px;padding-top:25px;border-top:1px solid var(--line)}.service-section{margin-top:0;padding-top:20px}.section-title{font-size:28px;font-weight:700;letter-spacing:-.7px;margin-bottom:12px}.section-kicker,.mini{font-weight:700;color:var(--primary)}.section-desc{font-size:15px}.feature-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.service{position:relative;display:grid;grid-template-columns:44px 1fr;column-gap:13px;text-align:left;align-items:center;background:#fff;border:1px solid var(--line);border-radius:13px;padding:18px 30px 18px 15px;color:var(--ink);cursor:pointer;transition:background .15s,border-color .15s}.service:hover{background:#f7f9ff;border-color:#9db5f0}.service-icon{grid-row:span 2;background:#eef3ff;width:42px;height:42px;display:grid;place-items:center;border-radius:11px;color:var(--primary)}.service-icon svg{width:23px;height:23px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}.service b{font-size:17px;line-height:1.35;font-weight:700}.service>span:not(.service-icon){font-size:12px;color:var(--muted);line-height:1.5;margin-top:5px}.service i{position:absolute;right:12px;top:20px;font-style:normal;color:#8091ae}.card{border-radius:15px;box-shadow:none;padding:22px}.card h3,.card h4{font-weight:700;font-size:20px}.hero-stats{gap:0;margin:22px 0 17px;border:1px solid var(--line);border-radius:14px;overflow:hidden}.stat-card{border-radius:0;border:0;border-right:1px solid var(--line);padding:21px 19px}.stat-card:last-child{border-right:0}.stat-value{font-weight:700;color:var(--primary);font-size:27px;font-family:system-ui,'Malgun Gothic',sans-serif;letter-spacing:-1px}.stat-value span{font-size:15px;margin-left:4px;font-family:'Sejong',sans-serif}.stat-card p{color:var(--muted);font-size:12px;margin:9px 0 0}.stat-label{font-weight:700;color:var(--ink)}.data-flow{gap:10px}.flow-step{border:0;border-radius:10px;background:#f6f8fc;padding:17px;color:var(--muted);font-size:13px}.flow-step b{font-size:15px;color:var(--ink)}.fineprint{font-size:12px;color:var(--muted);line-height:1.7;margin:15px 0}.fineprint a{text-decoration:underline;color:var(--primary)}.analysis-grid{gap:14px}.chart{min-height:0}.chart svg{display:block;max-width:100%}.primary-btn{border-radius:9px;font-weight:700}.secondary-btn,.ghost-btn{border-radius:9px}.car-results{border:1px solid var(--line);border-radius:15px;padding:20px;margin:0 0 25px}.car-result{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}.car-result:last-child{border:0}.car-result b{font-size:16px;font-weight:700}.car-result p{margin:3px 0;color:var(--muted);font-size:13px}.car-result button{white-space:nowrap}.metric-callout{font-size:14px;color:var(--primary);font-weight:700;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}.report-stats .stat-card{border:1px solid var(--line);border-radius:12px}.info-note{background:#fff8ef;border-color:#f3e4d2;color:#795b39}button:focus-visible,a:focus-visible{outline:3px solid #83a7f0;outline-offset:3px}.barline i{background:#7092df}.page:not([data-page=home]){padding-top:30px}.home-section{scroll-margin-top:90px}
+@media(max-width:900px){.feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:1.15fr .85fr;gap:20px}.hero-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-stats .stat-card:nth-child(2){border-right:0}.hero-stats .stat-card:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+@media(max-width:650px){main{padding:0 16px 40px}.bar{padding:12px 16px}.brand{font-size:22px;margin-bottom:7px}nav{gap:2px}nav button{font-size:12px;padding:7px 8px}.hero{grid-template-columns:1fr;padding:26px 0 18px;gap:10px}.hero-title{font-size:35px}.hero p{font-size:15px}.car-cta{max-width:250px}.feature-grid{grid-template-columns:1fr 1fr;gap:8px}.service{padding:12px 20px 12px 10px;grid-template-columns:1fr;gap:5px}.service-icon{grid-row:auto;width:34px;height:34px}.service b{font-size:15px}.service>span:not(.service-icon){font-size:11px}.service i{right:8px;top:12px}.section-title{font-size:24px}.home-section{margin-top:28px;padding-top:20px}.service-section{margin-top:0}.stat-value{font-size:23px}.hero-stats .stat-card{padding:14px}.data-flow{grid-template-columns:1fr 1fr}.car-search{gap:7px;padding-left:10px}.car-search button{padding:10px 15px}.car-search input{font-size:13px}.car-result{grid-template-columns:1fr}.card h3{font-size:18px}}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand"><span>내 차 연료 건강검진</span></div>
+    <nav>
+      <button class="nav active" data-page="home">홈</button><button class="nav" onclick="activatePage('home');setTimeout(()=>$('resultsSection').scrollIntoView(),80)">데이터 분석</button>
+      <button class="nav" data-page="vehicle">차량 · 주유 기록</button>
+      <button class="nav" data-page="public">연료 정보</button>
+      <button class="nav" data-page="lab">AI 연구실</button>
+    </nav>
+  </div>
+</header>
+<main><p class="fineprint" style="margin:0 0 10px">공개 체험판 · 차량 및 주유 기록은 이 브라우저에만 저장됩니다. 공용 PC에서는 이용 후 차량을 삭제하세요. OCR은 로컬 버전 전용입니다.</p>
+  <section id="analysisTop" class="page" data-page="home">
+    <div class="hero" id="intro">
+      <div class="hero-copy">
+        <div class="section-kicker">자동차 연비 · 주유 기록 · 맞춤 분석</div>
+        <h1 class="hero-title">내 차, 얼마나<br><span class="accent">효율적으로 달리고 있을까요?</span></h1>
+        <p>차량을 검색하고 주유 기록을 남겨 보세요.<br>내 차의 연료 소비 변화와 추가 연료비를 확인할 수 있어요.</p>
+        <form class="car-search" id="carSearchForm"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="carSearch" aria-label="차량명 또는 제조사" placeholder="차량명 또는 제조사를 검색해 보세요" required><button class="primary-btn" type="submit">검색</button></form>
+        <div class="quick-search"><span>예시</span><button onclick="exampleCar('셀토스')">셀토스</button><button onclick="exampleCar('아반떼')">아반떼</button><button onclick="exampleCar('쏘렌토')">쏘렌토</button></div>
+        <button class="text-link" onclick="openVehicle('v1')">찾는 차량이 없다면 직접 등록하기 →</button>
+      </div>
+      <div class="hero-carwrap">
+        <button class="car-cta" onclick="openVehicle('v1')" aria-label="내 차 검진 시작하기">
+          <svg viewBox="0 0 420 265" width="100%" aria-hidden="true">
+            <defs><linearGradient id="bodyPaint" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#83a7f0"/><stop offset="1" stop-color="#345fca"/></linearGradient></defs>
+            <circle cx="210" cy="127" r="108" fill="#eef3ff"/><circle cx="210" cy="127" r="87" fill="none" stroke="#cbd9f7" stroke-dasharray="4 8"/>
+            <path d="M28 83H98l12-16 15 28 21-53 19 41h56l16-18 15 18h141" fill="none" stroke="#83a7f0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <ellipse cx="210" cy="213" rx="156" ry="12" fill="#dce5f4"/>
+            <path d="M49 161q2-17 20-24l42-13 37-34q9-8 23-8h77q15 0 25 11l33 32 45 13q18 5 20 23v29H49Z" fill="url(#bodyPaint)"/>
+            <path d="M130 124l32-30h87q8 0 16 8l21 22Z" fill="#fff" opacity=".9"/><path d="M210 94v30" stroke="#4169be" stroke-width="4"/>
+            <path d="M65 156h22m247 0h23" stroke="#f7faff" stroke-width="6" stroke-linecap="round"/><path d="M159 141h15m67 0h15" stroke="#dce8ff" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="106" cy="189" r="26" fill="#24334b"/><circle cx="106" cy="189" r="13" fill="#cbd7ee"/><circle cx="311" cy="189" r="26" fill="#24334b"/><circle cx="311" cy="189" r="13" fill="#cbd7ee"/>
+            <circle cx="339" cy="61" r="25" fill="#fff" stroke="#dbe5fb"/><path d="M329 61h7l4-7 5 14 4-7h5" stroke="#315bc3" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </svg>
+          <span class="car-caption">내 차 검진해보기 <span>→</span></span>
+          <small>차량 등록부터 소비 패턴 분석까지</small>
+        </button>
+      </div>
+    </div>
+    <div id="carResults" class="car-results" hidden aria-live="polite"></div>
+    <section id="what" class="home-section service-section">
+      <h2 class="section-title">이곳에서 무엇을 할 수 있나요?</h2>
+      <div class="feature-grid">
+        <button class="service" onclick="$('carSearch').focus();$('intro').scrollIntoView()"><span class="service-icon"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg></span><b>내 차 연비 검색</b><span>국내 표시연비와 차량 정보 확인</span><i>→</i></button>
+        <button class="service" onclick="openVehicle('v2')"><span class="service-icon"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6m-6 4h6"/></svg></span><b>주유 기록 관리</b><span>주유량 직접 입력 및 주유 내역 저장</span><i>→</i></button>
+        <button class="service" onclick="openVehicle('v3')"><span class="service-icon"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg></span><b>내 차 건강검진</b><span>실제 소비량과 AI 예상 소비량 비교</span><i>→</i></button>
+        <button class="service" onclick="$('economy').scrollIntoView()"><span class="service-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18m-5 5h2"/></svg></span><b>연료비 계산</b><span>소비량 변화에 따른 추가 지출 추정</span><i>→</i></button>
+        <button class="service" onclick="openPublic('stations')"><span class="service-icon"><svg viewBox="0 0 24 24"><path d="M5 20V4h10v16M3 20h14M7 7h6v5H7m8 0h2v6q4 3 4-2V9l-3-3"/></svg></span><b>주유소 정보</b><span>전국 주유소와 품질관리 협약 정보</span><i>→</i></button>
+        <button class="service" onclick="openPublic('quality')"><span class="service-icon"><svg viewBox="0 0 24 24"><path d="M4 5q5-2 8 2 3-4 8-2v14q-5-2-8 2-3-4-8-2zM12 7v14"/></svg></span><b>연료 건강백과</b><span>휘발유 품질 기준과 항목별 설명</span><i>→</i></button>
+      </div>
+    </section>
+    <section id="how" class="home-section evidence">
+      <div class="section-kicker">분석의 근거</div><h2 class="section-title">실제 주행 데이터에서 시작했습니다.</h2>
+      <p class="section-desc">공공데이터는 차량·주유소·가격 조회에, 실주행 데이터는 연료 소비 예측 연구에 활용했습니다.</p>
+      <div class="hero-stats">
+        <div class="stat-card"><div class="stat-label">미국 실주행 센서 원본</div><div class="stat-value">22,436,808<span>건</span></div><p>VED · 357대 차량</p></div>
+        <div class="stat-card"><div class="stat-label">중국 실주행 기록</div><div class="stat-value">385,158<span>건</span></div><p>Mendeley · 395대 차량</p></div>
+        <div class="stat-card"><div class="stat-label">가상 주유 구간</div><div class="stat-value">80,514<span>건</span></div><p>150·300·500km 조건 합산</p></div>
+        <div class="stat-card"><div class="stat-label">국내 공공데이터</div><div class="stat-value">6<span>종</span></div><p>연비·주유소·유가·품질 정보</p></div>
+      </div>
+      <div class="data-flow"><div class="flow-step"><b>01. 수집 · 정제</b>센서 결측 및 주행 구간 확인</div><div class="flow-step"><b>02. 예측 모델 학습</b>차량별 분리 학습·검증</div><div class="flow-step"><b>03. 개인화 · 평가</b>과거 기록과 합성 변화 실험</div><div class="flow-step"><b>04. 내 차량 적용</b>가득 주유 구간 기준 분석</div></div>
+      <p class="fineprint">출처: <a href="https://github.com/gsoh/VED" target="_blank" rel="noopener">VED</a> · <a href="https://data.mendeley.com/datasets/jzjxcdn6k4/2" target="_blank" rel="noopener">Mendeley Data</a> · 한국에너지공단 · 한국석유공사 · 한국석유관리원 · 전국주유소표준데이터. 국내 적용 및 실제 주유량 검증은 아직 수행하지 않았습니다.</p>
+    </section>
+    <section id="resultsSection" class="home-section">
+      <div class="section-kicker">연구 결과</div><h2 class="section-title">데이터가 알려주는 네 가지 사실</h2><p class="section-desc">분석 결과 파일을 기반으로 그린 그래프입니다. 각 그래프가 실제 서비스에 어떻게 연결되는지 살펴보세요.</p>
+      <div class="analysis-grid">
+      <div class="card"><div class="mini">01 · 예측</div><h3>공식 연비보다 현실적인 인공지능</h3><p>150·300·500km 가상 구간의 평균 절대오차(MAE, L/100km). 낮을수록 정확합니다.</p><div class="chart" id="maeChart"></div></div>
+      <div class="card"><div class="mini">02 · 개인화</div><h3>기록이 쌓일수록 내 차를 더 잘 이해합니다</h3><p>300km 가상 구간의 기록 수별 차량 평균 MAE (L/100km).</p><div class="chart" id="historyChart"></div></div>
+      <div class="card"><div class="mini">03 · 변화 탐지</div><h3>연료 소비 증가에 반응하는 경보</h3><p>합성 소비량 증가율(%)에 따른 정밀 모델의 경보율(%).</p><div class="chart" id="simChart"></div></div>
+      <div class="card"><div class="mini">04 · 변수</div><h3>무엇이 연료 소비 분석에 중요한가요?</h3><p>VED 모델의 순열 중요도 상위 6개 변수.</p><div class="chart progress-list" id="importanceChart"></div></div>
+    </div>
+      <div class="fineprint">예측과 개인화는 베이징 OBD 자료에서 생성한 가상 주유 구간 기준입니다. 변화 탐지는 합성 소비량 증가 실험이며 실제 불량연료 판별률이 아닙니다. 변수 중요도는 VED 연구용 모델의 예측 기여도이며 인과관계를 뜻하지 않습니다.</div>
+    </section>
+    <section id="economy" style="margin-top:36px">
+      <div class="section-kicker">생활 속 변화</div>
+      <h2 class="section-title">작은 연료 소비 변화가 만드는 비용 차이</h2>
+      <p class="section-desc">월 주행거리, 평균 연비, 연료 가격, 소비 증가율을 입력해 얼마나 비용 부담이 생길지 바로 계산해 볼 수 있습니다.</p>
+      <div class="two-col">
+        <div class="card">
+          <div class="fields">
+            <div><label>월 주행거리 (km)</label><input id="homeKm" type="number" value="1000"></div>
+            <div><label>평균 연비 (km/L)</label><input id="homeEff" type="number" step="0.1" value="12"></div>
+            <div><label>연료 가격 (원/L, 기본 예시값)</label><input id="homePrice" type="number" value="1800"></div>
+            <div><label>소비 증가율 <span id="homeIncLabel">20%</span></label><input id="homeInc" type="range" min="0" max="50" value="20"></div>
+          </div>
+          <div class="form-actions"><select id="homeRegions"><option value="">지역 평균 유가 불러오기</option></select></div>
+          <div class="barline" style="margin-top:18px"><i id="costFill" style="width:65%"></i></div>
+          <div id="costBars" style="margin-top:12px;color:var(--muted)"></div>
+        </div>
+        <div class="card">
+          <div class="mini">추정 결과</div>
+          <div class="hero-title" style="font-size:48px;margin:4px 0 4px" id="homeExtra">0원</div>
+          <p class="section-desc" id="homeAnnual">연간 0원</p>
+          <div class="info-note">연료 소비의 작은 증가도 월간·연간 비용 부담으로 이어질 수 있습니다. 이 섹션은 사용자가 변화의 의미를 직관적으로 이해하도록 돕기 위한 계산기입니다.</div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section id="mycar" class="page" data-page="vehicle" hidden>
+    <div class="section-kicker">내 차 연료 건강검진</div>
+    <h2 class="section-title">차량 등록, 주유 기록, AI 검진 리포트</h2>
+    <p class="section-desc">차량을 등록하고 주유 기록을 쌓으면, 분석 결과를 내 차에 직접 연결해 볼 수 있습니다.</p>
+    <div class="panel-tabs">
+      <button class="sub active" data-sub="v1">차량 등록</button>
+      <button class="sub" data-sub="v2">주유 기록</button>
+      <button class="sub" data-sub="v3">검진 리포트</button>
+    </div>
+
+    <div id="v1" class="subpage">
+      <div class="two-col">
+        <div class="card">
+          <h3>차량 등록</h3>
+          <div class="fields">
+            <div><label>차량 이름</label><input id="vname" placeholder="예: 나의 차량"></div>
+            <div><label>연식</label><input id="vyear" type="number" value="2015"></div>
+            <div><label>배기량 (L)</label><input id="vdisp" type="number" step="0.1" value="2.0"></div>
+            <div><label>공식 복합연비 (km/L)</label><input id="veff" type="number" step="0.1" value="12"></div>
+            <div><label>유종</label><select id="vfuel"><option value="gasoline">휘발유</option><option value="diesel">경유</option><option value="hybrid">하이브리드</option><option value="lpg">LPG</option><option value="other">기타</option></select></div>
+          </div>
+          <div class="form-actions"><button onclick="addVehicle()" class="primary-btn">차량 등록</button></div>
+          <div id="vehicleMsg" class="section-desc"></div>
+        </div>
+        <div class="card"><h3>등록된 차량</h3><div id="vehicleList" class="tablewrap"></div></div>
+      </div>
+    </div>
+
+    <div id="v2" class="subpage" hidden>
+      <div class="two-col">
+        <div class="card">
+          <h3>주유 기록 입력</h3>
+          <div class="fields">
+            <div><label>대상 차량</label><select id="vehicleSelect"></select></div>
+            <div><label>기록 시각</label><input id="at" type="datetime-local"></div>
+            <div><label>누적 주행거리 (km)</label><input id="odo" type="number" step="0.1"></div>
+            <div><label>주유량 (L)</label><input id="liters" type="number" step="0.01"></div>
+            <div><label>총 결제금액 (원)</label><input id="amount" type="number" step="1"></div>
+            <div><label>이전 주유 이후 운전 시간 (분, 선택)</label><input id="duration" type="number" step="1"></div>
+            <div><label>주유소명 (선택)</label><input id="station"></div>
+            <div><label>가득 주유 여부</label><select id="full"><option value="true">가득 주유</option><option value="false">부분 주유</option></select></div>
+          </div>
+          <div class="form-actions"><button onclick="addRefill()" class="primary-btn">주유 기록 저장</button><button onclick="setNow()" class="ghost-btn">현재 시각 입력</button></div>
+          <div class="info-note" style="margin-top:14px">부분 주유 기록은 다음 가득 주유 시점까지 합산되어 구간 분석에 사용됩니다. 연료 소비량은 가득 주유 기준으로 계산합니다.</div>
+        </div>
+        <div class="card"><h3>영수증 참고 (선택)</h3>
+          <input type="file" id="photo" accept="image/png,image/jpeg,image/webp">
+          <div class="form-actions"><button onclick="runOcr()" class="secondary-btn" disabled>자동 읽기 (로컬 버전 전용)</button></div>
+          <div id="ocrResult" class="section-desc"></div>
+          <img id="ocrPreview" hidden style="max-width:100%;border-radius:16px;border:1px solid var(--line)">
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px"><h3>저장된 주유 기록</h3><div id="refillList" class="tablewrap"></div></div>
+    </div>
+
+    <div id="v3" class="subpage" hidden>
+      <div class="two-col">
+        <div class="card">
+          <h3>검진 대상 차량</h3>
+          <select id="reportVehicle"></select>
+          <div class="form-actions"><button onclick="refreshReport()" class="primary-btn">검진 리포트 불러오기</button></div>
+          <div class="info-note">학습 모델 파일을 추가한 경우에만 휘발유, 2011~2017년식, 배기량 1~3L, 공식 소비량 6.9~10.2 L/100km, 주유 구간 300~400km에 한해 참고 예측을 제공합니다. 적격 과거 구간 5개 이후 개인화 경보를 제공하며 국내 실증 전 단계입니다.</div>
+        </div>
+        <div class="card">
+          <h3>상태 해석</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="badge good">큰 증가 관찰 없음</span>
+            <span class="badge warn">변화 관찰</span>
+            <span class="badge">기준 기록 · 분석 보류</span>
+          </div>
+          <p class="section-desc" style="margin-top:12px">예상 소비량 대비 실제 소비량의 증가 패턴을 보고 상태를 분류합니다. 실제 연료 품질 판정이 아니라, 소비 패턴의 변화 관찰 도구입니다.</p>
+        </div>
+      </div>
+      <div class="info-note" id="modelAvailability" style="margin-top:16px">공개 웹 버전: 모델 연결 상태 확인 중</div><div id="reportBody" style="margin-top:16px"></div>
+    </div>
+  </section>
+
+  <section class="page" data-page="public" hidden>
+    <div class="section-kicker">공공데이터와 연료 정보</div>
+    <h2 class="section-title">차량, 주유소, 유가, 협약주유소 정보를 함께 확인하세요</h2>
+    <p class="section-desc">내 차량 검진에 참고할 수 있는 외부 정보를 한 곳에 모았습니다.</p>
+    <div class="panel-tabs">
+      <button class="pub active" data-kind="cars">자동차 표시연비</button>
+      <button class="pub" data-kind="stations">전국 주유소</button>
+      <button class="pub" data-kind="partners">협약주유소</button>
+      <button class="pub" data-kind="quality">연료 건강백과</button>
+    </div>
+    <div class="toolbar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"><input id="query" placeholder="검색어를 입력하세요" style="max-width:340px"><button onclick="searchCatalog()" class="secondary-btn">검색</button></div>
+    <div class="card"><div id="catalogBody" class="tablewrap"></div></div>
+    <div class="mapbox" id="mapPanel" hidden style="margin-top:16px"><div id="mapDetails" class="section-desc">좌표 분포도</div><div id="stationMap"></div></div>
+  </section>
+
+  <section class="page" data-page="lab" hidden>
+    <div class="section-kicker">분석 방법과 검증</div>
+    <h2 class="section-title">심사위원과 담당자를 위한 기술 근거</h2>
+    <p class="section-desc">서비스 뒤에 있는 데이터 규모, 시뮬레이션, 집단 검토율, 분석 요약 파일을 확인할 수 있습니다.</p>
+    <div class="two-col">
+      <div class="card"><h3>집단 이상신호 검토율</h3><div id="groupChart" class="chart"></div></div>
+      <div class="card"><h3>요약 파일</h3><div id="researchBody" class="progress-list"></div></div>
+    </div>
+  </section>
+
+  <div class="footer">본 누리집은 세종특별자치시의 세종글꽃체를 사용하여 제작되었습니다. 본 서비스의 AI 결과는 연료 소비 패턴 변화 관찰용이며 실제 연료 품질 판정 결과가 아닙니다.</div>
+</main>
+<script>
+const $=id=>document.getElementById(id), $$=q=>Array.from(document.querySelectorAll(q));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;',"'":'&#39;'}[c]));
+const num=(x,d=2)=>x!==null&&x!==undefined&&x!==''&&Number.isFinite(+x)?(+x).toLocaleString('ko-KR',{maximumFractionDigits:d,minimumFractionDigits:d===0?0:0}):'–';
+let currentPublicKind='cars'; let selectedVehicle=0;
+const dataReady=fetch('./assets/data.json').then(r=>{if(!r.ok)throw Error('공공데이터 파일 없음');return r.json()});
+const modelReady=fetch('./assets/models.json').then(r=>r.ok?r.json():null).catch(()=>null);
+const STORE='fuel-health-v7:'+location.pathname; function db(){return JSON.parse(localStorage.getItem(STORE)||'{"vehicles":[],"refills":[],"next":1}')}function save(d){localStorage.setItem(STORE,JSON.stringify(d))}
+function check(x,min,max,label){if(!Number.isFinite(x)||x<min||x>max)throw Error(label+' 입력 범위를 확인하세요.');return x}
+function median(a){a=[...a].sort((x,y)=>x-y);let n=a.length;return n%2?a[n>>1]:(a[n/2-1]+a[n/2])/2}
+function predictModel(v,i,m){let x={official_l100km:100/v.official_kml,year:v.year,displacement:v.displacement,distance_km:i.distance_km,duration_s:i.duration_s,mean_speed_kmh:3600*i.distance_km/i.duration_s};let f=m.features.map(k=>x[k]);let y=m.base;for(let tree of m.trees){let n=tree[0];while(!n[0])n=tree[f[n[2]]<=n[3]?n[4]:n[5]];y+=n[1]}return Math.max(.1,y)}
+function eligible(v,i,mode){return v.fuel==='gasoline'&&v.year>=2011&&v.year<=2017&&100/v.official_kml>=6.9&&100/v.official_kml<=10.2&&v.displacement>=1&&v.displacement<=3&&i.distance_km>=300&&i.distance_km<=400&&(mode!=='duration'||(i.duration_s&&3600*i.distance_km/i.duration_s>=5&&3600*i.distance_km/i.duration_s<=120))}
+function makeReport(v,rows,models){let anchor=null,pending=[],seq=[];for(let r of rows){if(!anchor){if(r.full)anchor=r;continue}pending.push(r);if(!r.full)continue;let km=r.odometer-anchor.odometer,l=pending.reduce((s,p)=>s+p.liters,0),dur=pending.every(p=>p.duration_s!=null)?pending.reduce((s,p)=>s+p.duration_s,0):null,cost=pending.every(p=>p.amount!=null)?pending.reduce((s,p)=>s+p.amount,0):null;if(km>0&&l>0)seq.push({start:anchor.at,end:r.at,distance_km:km,liters:l,actual_l100km:100*l/km,actual_kml:km/l,duration_s:dur,cost_krw:cost});anchor=r;pending=[]}return {intervals:seq.map((i,j)=>{let o={...i,status:'observation_only'};for(let mode of ['duration','receipt']){let m=models?.[mode];if(!m||!eligible(v,i,mode))continue;let expected=predictModel(v,i,m),past=seq.slice(0,j).filter(h=>eligible(v,h,mode));Object.assign(o,{mode,expected_l100km:expected,status:'reference_only'});if(past.length>=5){expected=Math.max(.1,expected+m.weight*median(past.slice(0,5).map(h=>h.actual_l100km-predictModel(v,h,m))));let residual=i.actual_l100km-expected,extra=Math.max(0,residual*i.distance_km/100);Object.assign(o,{expected_l100km:expected,status:residual>m.threshold?'review_pattern':'no_large_increase_observed',estimated_excess_liters:extra,estimated_extra_cost_krw:i.cost_krw==null?null:Math.round(extra*i.cost_krw/i.liters)})}break}return o})}}
+async function api(url,opts={}){let u=new URL(url,location.origin),p=u.pathname.split('/').filter(Boolean),method=opts.method||'GET',body=opts.body?JSON.parse(opts.body):null;if(['catalog','prices','visuals','research','station-map'].includes(p[1])){let d=await dataReady;if(p[1]==='catalog'||p[1]==='station-map'){let c=d.catalog[p[1]==='station-map'?'stations':p[2]],terms=(u.searchParams.get('q')||'').toLowerCase().trim().split(/\s+/),rows=c.rows.filter(r=>terms.every(t=>Object.values(r).join(' ').toLowerCase().includes(t)));if(p[1]==='catalog')return {source:c.source,total:rows.length,rows:rows.slice(0,80)};return {source:c.source,points:rows.map(r=>({lat:+r['위도'],lon:+r['경도'],name:r['주유소명'],address:r['소재지도로명주소']||r['소재지지번주소']})).filter(r=>r.lat>32&&r.lat<39&&r.lon>124&&r.lon<132)}}return d[p[1]]}let d=db(),id=+p[2],v=d.vehicles.find(x=>x.id===id);if(p.length===2){if(method==='GET')return d.vehicles;let x=body;if(!x.name.trim()||x.name.length>120)throw Error('차량 이름 확인');check(x.year,1980,2100,'연식');if(!Number.isInteger(x.year))throw Error('연식 확인');check(x.displacement,.1,12,'배기량');check(x.official_kml,1,100,'연비');x.id=d.next++;d.vehicles.push(x);save(d);return {id:x.id}}if(!v)throw Error('차량을 먼저 등록하세요.');if(p.length===3&&method==='DELETE'){d.vehicles=d.vehicles.filter(x=>x.id!==id);d.refills=d.refills.filter(x=>x.vehicle_id!==id);save(d);return {ok:true}}let rows=d.refills.filter(x=>x.vehicle_id===id).sort((a,b)=>a.at.localeCompare(b.at));if(p[3]==='report')return makeReport(v,rows,await modelReady);if(method==='GET')return rows.reverse();if(method==='DELETE'){if(rows.at(-1)?.id!==+p[4])throw Error('최근 기록만 삭제 가능');d.refills=d.refills.filter(x=>x.id!==+p[4]);save(d);return {ok:true}}let x=body;check(x.odometer,0,3000000,'주행거리');check(x.liters,.01,300,'주유량');if(x.amount!=null)check(x.amount,0,10000000,'결제금액');if(x.duration_s!=null)check(x.duration_s,1,10000000,'운전 시간');if(!x.at||!Number.isFinite(Date.parse(x.at)))throw Error('기록 시각 확인');let prev=rows.at(-1);if(prev&&(x.at<=prev.at||x.odometer<prev.odometer))throw Error('날짜는 이전보다 이후, 거리는 이전 이상이어야 합니다.');x.id=d.next++;x.vehicle_id=id;d.refills.push(x);save(d);return {id:x.id}}
+
+function activatePage(name){$$('.page').forEach(x=>x.hidden=x.dataset.page!==name); $$('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===name)); if(name==='vehicle'){refreshVehicles().then(()=>{refreshRefills(); refreshReport();});} if(name==='public') searchCatalog(); if(name==='lab') loadResearch(); window.scrollTo({top:0,behavior:'smooth'})}
+$$('.nav[data-page]').forEach(b=>b.onclick=()=>activatePage(b.dataset.page));
+$$('.sub').forEach(b=>b.onclick=()=>{ $$('.sub').forEach(x=>x.classList.remove('active')); b.classList.add('active'); $$('.subpage').forEach(x=>x.hidden=x.id!==b.dataset.sub); if(b.dataset.sub==='v2') refreshRefills(); if(b.dataset.sub==='v3') refreshReport(); });
+$$('.pub').forEach(b=>b.onclick=()=>{ $$('.pub').forEach(x=>x.classList.remove('active')); b.classList.add('active'); currentPublicKind=b.dataset.kind; searchCatalog();});
+
+function table(rows, cols){ if(!rows || !rows.length) return '<p class="section-desc">표시할 데이터가 없습니다.</p>'; return '<table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+cols.map(c=>'<td>'+esc(r[c] ?? '')+'</td>').join('')+'</tr>').join('')+'</tbody></table>'; }
+function svgLegend(labels,colors){return '<div class="legend">'+labels.map((x,i)=>`<span><i style="background:${colors[i]}"></i>${esc(x)}</span>`).join('')+'</div>'}
+function drawGraph(id, labels, series, {line=false, maxVal=null, palette=['#829de0','#bfa27f','#5a6c84']}={}){
+  const el=$(id); if(!labels.length||!series.length){el.innerHTML='<p class="section-desc">그래프 자료가 없습니다.</p>'; return;}
+  const valid = series.every(s=>s.values.every(v=>Number.isFinite(v)));
+  if(!valid){el.innerHTML='<p class="section-desc">그래프 자료를 읽지 못했습니다.</p>'; return;}
+  const max = maxVal || Math.max(...series.flatMap(s=>s.values))*1.18 || 1;
+  const W=540,H=235,x0=52,y0=200,ww=456,hh=155;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">`;
+  for(let i=0;i<=4;i++){let y=y0-hh*i/4; svg += `<path d="M${x0} ${y}H512" stroke="#e6eaf0"/><text x="42" y="${y+4}" text-anchor="end" font-size="11" fill="#798395">${num(max*i/4,1)}</text>`}
+  const dx=ww/labels.length;
+  labels.forEach((l,j)=>{let x=x0+dx*(j+.5); svg += `<text x="${x}" y="226" text-anchor="middle" font-size="12" fill="#7a8393">${esc(l)}</text>`});
+  series.forEach((s,k)=>{
+    const color=palette[k%palette.length]; const pts=s.values.map((v,j)=>[x0+dx*(j+.5), y0-hh*v/max]);
+    if(line){svg+=`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${color}" stroke-width="3"/>`; pts.forEach((p,j)=>svg+=`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="${color}"><title>${esc(s.name)}: ${num(s.values[j])}</title></circle>`)}
+    else {const bw=Math.min(34,dx/(series.length+1)); pts.forEach((p,j)=>{let x=p[0]+(k-(series.length-1)/2)*bw-bw/2; svg += `<rect x="${x}" y="${p[1]}" width="${bw-4}" height="${y0-p[1]}" rx="4" fill="${color}"><title>${esc(s.name)}: ${num(s.values[j],3)}</title></rect>`;});}
+  });
+  svg+='</svg>'+svgLegend(series.map(s=>s.name), series.map((_,i)=>palette[i%palette.length]));
+  el.innerHTML=svg;
+}
+function statusBadge(status){
+  if(status==='no_large_increase_observed') return '<span class="badge good">큰 증가 관찰 없음</span>';
+  if(status==='review_pattern') return '<span class="badge warn">변화 관찰</span>';
+  return '<span class="badge">'+(status==='reference_only'?'기준 기록':'분석 보류')+'</span>';
+}
+
+async function loadVisuals(){
+  try{
+    const r = await api('/api/visuals');
+    const km=[150,300,500];
+    const pick=(arr, fn, key)=>{const v=(arr||[]).find(fn); return v?Number(v[key]):NaN};
+    drawGraph('maeChart', km.map(x=>x+'km'), [
+      {name:'공식 연비', values: km.map(k=>pick(r.metrics, x=>+x.goal_km===k && x.model==='official_receipt', 'mae'))},
+      {name:'간편형', values: km.map(k=>pick(r.metrics, x=>+x.goal_km===k && x.model==='receipt', 'mae'))},
+      {name:'정밀형', values: km.map(k=>pick(r.metrics, x=>+x.goal_km===k && x.model==='duration', 'mae'))},
+    ], {palette:['#c4ccd9','#e2a35d','#315bc3']});
+
+    drawGraph('historyChart', ['공통','1회','3회','5회'], [
+      {name:'간편형', values:[pick(r.history, x=>+x.goal_km===300&&x.mode==='receipt', 'global_macro_mae'), ...[1,3,5].map(n=>pick(r.history, x=>+x.goal_km===300&&x.mode==='receipt'&&+x.history_intervals===n, 'personal_macro_mae'))]},
+      {name:'정밀형', values:[pick(r.history, x=>+x.goal_km===300&&x.mode==='duration', 'global_macro_mae'), ...[1,3,5].map(n=>pick(r.history, x=>+x.goal_km===300&&x.mode==='duration'&&+x.history_intervals===n, 'personal_macro_mae'))]},
+    ], {line:true, palette:['#829de0','#e2a35d']});
+
+    const inc=[0,.1,.2,.3,.5];
+    drawGraph('simChart', inc.map(x=>Math.round(x*100)+'%'), km.map(k=>({name:k+'km 정밀', values:inc.map(i=>100*pick(r.simulation, x=>+x.goal_km===k&&x.mode==='duration'&&Math.abs(+x.increase-i)<1e-6,'alert_rate'))})), {line:true, maxVal:100, palette:['#b9c8ef','#7797e5','#315bc3']});
+
+    const names={mean_speed_kmh:'평균속도',rpm_mean:'엔진 RPM',load_mean:'엔진 부하',idle_fraction:'정차 비율',accel_abs_mean:'가속도',speed_std:'속도 변동'};
+    const arr=(r.importance||[]).sort((a,b)=>+b.mean-+a.mean).slice(0,6); const max=Math.max(...arr.map(x=>+x.mean),.01);
+    $('importanceChart').innerHTML = arr.length ? arr.map(x=>`<div><span>${esc(names[x.feature]||x.feature)}</span><span style="float:right">${num(+x.mean,3)}</span><div class="barline"><i style="width:${Math.max(0,+x.mean/max*100)}%"></i></div></div>`).join('') : '<p class="section-desc">결과 파일 없음</p>';
+
+    const addNote=(id,text)=>{if(text){const d=document.createElement('div');d.className='metric-callout';d.textContent=text;$(id).append(d)}};
+    const off=pick(r.metrics,x=>+x.goal_km===300&&x.model==='official_receipt','mae'), plus=pick(r.metrics,x=>+x.goal_km===300&&x.model==='duration','mae');
+    if(off>0&&Number.isFinite(plus))addNote('maeChart','300km 정밀 모델 · 공식 연비 기준 대비 오차 '+num(100*(1-plus/off),1)+'% 감소');
+    const g=pick(r.history,x=>+x.goal_km===300&&x.mode==='duration','global_macro_mae'), h=pick(r.history,x=>+x.goal_km===300&&x.mode==='duration'&&+x.history_intervals===5,'personal_macro_mae');
+    if(g>0&&Number.isFinite(h))addNote('historyChart','정밀 모델 · 과거 5개 구간 활용 시 오차 '+num(100*(1-h/g),1)+'% 감소');
+    const sim=pick(r.simulation,x=>+x.goal_km===500&&x.mode==='duration'&&Math.abs(+x.increase-.3)<1e-6,'alert_rate');if(Number.isFinite(sim))addNote('simChart','500km · 합성 소비 30% 증가 시 경보율 '+num(sim*100,1)+'%');
+    const group=(r.group||[]).filter(x=>Math.abs(+x.excess_probability-.1)<1e-6).sort((a,b)=>+a.sample_vehicles-+b.sample_vehicles);
+    drawGraph('groupChart', group.map(x=>x.sample_vehicles+'대'), group.length?[{name:'검토율', values:group.map(x=>100*+x.review_rate)}]:[], {line:true,maxVal:100,palette:['#315bc3']});
+  } catch(e){['maeChart','historyChart','simChart','importanceChart','groupChart'].forEach(id=>{if($(id)) $(id).innerHTML='<p class="section-desc">자료 읽기 실패: '+esc(e.message)+'</p>'})}
+}
+
+async function refreshVehicles(){
+  const rows=await api('/api/vehicles');
+  const html = rows.length ? table(rows.map(r=>({ID:r.id,차량명:r.name,연식:r.year,배기량:r.displacement,공식연비:r.official_kml,유종:r.fuel})), ['ID','차량명','연식','배기량','공식연비','유종']) : '<p class="section-desc">등록된 차량이 없습니다.</p>';
+  $('vehicleList').innerHTML=html+(rows.length?'<div class="form-actions"><select id="deleteVehicleSelect">'+rows.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('')+'</select><button class="ghost-btn" onclick="removeVehicle()">선택 차량 및 기록 삭제</button></div>':'');
+  const options = rows.map(r=>`<option value="${r.id}">${esc(r.name)} · ${r.year}년 · ${r.official_kml}km/L</option>`).join('');
+  $('vehicleSelect').innerHTML=options; $('reportVehicle').innerHTML=options;
+  if(rows.length){ selectedVehicle = rows.some(r=>r.id===selectedVehicle)?selectedVehicle:rows[0].id; $('vehicleSelect').value=selectedVehicle; $('reportVehicle').value=selectedVehicle; }
+  else selectedVehicle=0;
+}
+
+async function removeVehicle(){let id=+$('deleteVehicleSelect').value;if(!id||!confirm('차량과 모든 주유 기록을 삭제할까요?'))return;try{await api('/api/vehicles/'+id,{method:'DELETE'});await refreshVehicles();await refreshRefills();await refreshReport()}catch(e){alert(e.message)}}
+async function addVehicle(){
+  try{
+    if(! $('vyear').value || !$('vdisp').value || !$('veff').value)throw new Error('연식, 배기량, 공식 복합연비를 확인해 주세요.'); const created=await api('/api/vehicles', {method:'POST', body:JSON.stringify({name:$('vname').value, year:+$('vyear').value, displacement:+$('vdisp').value, official_kml:+$('veff').value, fuel:$('vfuel').value})});
+    selectedVehicle=created.id;$('vehicleMsg').textContent='차량이 등록되었습니다.'; $('vname').value=''; await refreshVehicles();
+  }catch(e){$('vehicleMsg').textContent='오류: '+e.message}
+}
+
+function setNow(){const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); $('at').value=d.toISOString().slice(0,16)}
+
+async function addRefill(){
+  try{
+    const vid=+$('vehicleSelect').value; if(!vid) throw new Error('차량을 먼저 등록하세요.'); if(!$('odo').value||!$('liters').value||!$('at').value)throw new Error('주행거리, 주유량, 기록 시각을 입력해 주세요.');
+    await api(`/api/vehicles/${vid}/refills`, {method:'POST', body:JSON.stringify({at:$('at').value, odometer:+$('odo').value, liters:+$('liters').value, full:$('full').value==='true', amount:$('amount').value?+$('amount').value:null, station:$('station').value||'', duration_s:$('duration').value?+$('duration').value*60:null})});
+    await refreshRefills(); refreshReport(); alert('주유 기록이 저장되었습니다.');
+  }catch(e){alert('저장 실패: '+e.message)}
+}
+
+async function refreshRefills(){
+  const vid=+$('vehicleSelect').value; if(!vid){$('refillList').innerHTML='<p class="section-desc">차량을 먼저 등록하세요.</p>'; return}
+  const rows=await api(`/api/vehicles/${vid}/refills`);
+  $('refillList').innerHTML = rows.length ? table(rows.map(r=>({ID:r.id,시각:r.at,주행거리:r.odometer,주유량:r.liters,가득:r.full?'예':'아니오',결제금액:r.amount||'',주행시간:r.duration_s==null?'':num(r.duration_s/60,1),주유소:r.station||''})), ['ID','시각','주행거리','주유량','가득','결제금액','주행시간','주유소'])+'<div class="form-actions"><button class="ghost-btn" onclick="removeRefill('+vid+','+rows[0].id+')">가장 최근 기록 삭제</button></div>' : '<p class="section-desc">저장된 주유 기록이 없습니다.</p>';
+}
+
+async function removeRefill(vid,rid){if(!confirm('가장 최근 주유 기록을 삭제할까요?'))return;try{await api(`/api/vehicles/${vid}/refills/${rid}`,{method:'DELETE'});await refreshRefills();await refreshReport()}catch(e){alert(e.message)}}
+async function runOcr(){$('ocrResult').textContent='공개 웹 버전에서는 OCR을 지원하지 않습니다. 영수증을 보고 직접 입력해 주세요.';}
+
+function lineSvg(arr,key,color,max){const x0=36,y0=170,hh=128,ww=500,dx=arr.length>1?ww/(arr.length-1):0; const valid=v=>v[key]!=null&&Number.isFinite(+v[key]); let path='',started=false;arr.forEach((v,i)=>{if(!valid(v)){started=false;return}path+=(started?'L':'M')+(x0+i*dx)+' '+(y0-v[key]*hh/max)+' ';started=true}); return `<path d="${path}" fill="none" stroke="${color}" stroke-width="3"/>` + arr.map((v,i)=>{if(!valid(v))return '';const x=x0+i*dx,y=y0-v[key]*hh/max; return `<circle cx="${x}" cy="${y}" r="4.5" fill="${color}"><title>${esc(v.end||'')} ${key}: ${num(v[key])}</title></circle>`}).join(''); }
+async function refreshReport(){
+  const vid=+$('reportVehicle').value || +$('vehicleSelect').value; if(!vid){$('reportBody').innerHTML='<p class="section-desc">차량을 먼저 등록하세요.</p>'; return}
+  try{
+    const r = await api(`/api/vehicles/${vid}/report`); const a = r.intervals || []; if(!a.length){ $('reportBody').innerHTML='<div class="card"><p class="section-desc">가득 주유 기준으로 분석 가능한 구간이 아직 없습니다. 가득 주유 기록 2개 이상이 필요합니다.</p></div>'; return; }
+    const last=a[a.length-1]; const max=Math.max(...a.map(x=>Math.max(+x.actual_l100km||0,+x.expected_l100km||0)),1)*1.15;
+    $('reportBody').innerHTML = `<div class="report-stats">
+      <div class="stat-card"><div class="stat-label">최근 상태</div><div style="margin-top:10px">${statusBadge(last.status)}</div></div>
+      <div class="stat-card"><div class="stat-label">실제 소비량</div><div class="stat-value">${num(last.actual_l100km)}</div><div class="section-desc">L/100km</div></div>
+      <div class="stat-card"><div class="stat-label">AI 예상 소비량</div><div class="stat-value">${num(last.expected_l100km)}</div><div class="section-desc">${esc(last.mode==='duration'?'정밀형':last.mode==='receipt'?'간편형':'적용 범위 밖 또는 모델 없음')}</div></div>
+      <div class="stat-card"><div class="stat-label">추정 추가 비용</div><div class="stat-value">${num(last.estimated_extra_cost_krw,0)}</div><div class="section-desc">원 / 최근 구간</div></div>
+    </div>
+    <div class="two-col">
+      <div class="card"><h3>주유 구간별 실제 소비량과 예상 소비량</h3><p class="section-desc">파란색은 실제 기록, 주황색은 AI 예상값입니다.</p><svg viewBox="0 0 560 220" width="100%">${[0,.25,.5,.75,1].map(f=>`<path d="M36 ${170-f*128}H540" stroke="#e7eaf0"/><text x="28" y="${174-f*128}" text-anchor="end" font-size="11" fill="#7b8594">${num(max*f,1)}</text>`).join('')}${a.map((v,i)=>`<text x="${36+(a.length>1?500/(a.length-1):0)*i}" y="198" text-anchor="middle" font-size="11" fill="#7b8594">${esc((v.end||'').slice(5,10))}</text>`).join('')}${lineSvg(a,'actual_l100km','#315bc3',max)}${lineSvg(a,'expected_l100km','#e2a35d',max)}</svg>${svgLegend(['실제 소비량','AI 예상 소비량'],['#315bc3','#e2a35d'])}</div>
+      <div class="card"><h3>해석 요약</h3><div class="progress-list"><div>최근 구간 수: <b>${a.length}</b></div><div>모델 적용 방식: <b>${esc(last.mode==='duration'?'정밀형':last.mode==='receipt'?'간편형':'적용 범위 밖 또는 모델 없음')}</b></div><div>예상 초과 연료량: <b>${num(last.estimated_excess_liters)}</b> L</div><div>주의 문구<div class="info-note" style="margin-top:8px">해외 OBD 가상 주유 구간 기반의 실험적 예측입니다. 국내 차량 및 실제 주유량 검증 전이며, 연료 품질 판정이 아닙니다.</div></div></div></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h3>분석 가능한 주유 구간</h3><div class="tablewrap">${table(a.slice().reverse().map(i=>({'종료일':i.end,'거리 km':num(i.distance_km),'실제 L/100km':num(i.actual_l100km),'예상 L/100km':num(i.expected_l100km),'상태':i.status==='no_large_increase_observed'?'큰 증가 관찰 없음':i.status==='review_pattern'?'변화 관찰':'참고 기록'})), ['종료일','거리 km','실제 L/100km','예상 L/100km','상태'])}</div></div>`;
+  } catch(e){ $('reportBody').innerHTML='<div class="card"><p class="section-desc">리포트 읽기 실패: '+esc(e.message)+'</p></div>'; }
+}
+
+async function searchCatalog(){
+  const r = await api('/api/catalog/'+currentPublicKind+'?q='+encodeURIComponent($('query').value||''));
+  $('catalogBody').innerHTML = '<div class="section-desc" style="padding:12px 4px">'+esc(r.source||'데이터 파일 없음')+' · 총 '+num(r.total,0)+'건 (최대 80건 표시)</div>'+table(r.rows, Object.keys(r.rows[0]||{}));
+  const showMap = currentPublicKind==='stations'; $('mapPanel').hidden=!showMap;
+  if(showMap){ const m=await api('/api/station-map?q='+encodeURIComponent($('query').value||'')); drawStationMap(m.points, m.source); }
+}
+function drawStationMap(points, source){
+  let svg='<svg viewBox="0 0 640 430" width="100%">';
+  for(let lon=125;lon<=131;lon++){let x=35+(lon-124)*70; svg+=`<path d="M${x} 20V385" stroke="#dbe2ea"/><text x="${x}" y="404" text-anchor="middle" font-size="10">${lon}°E</text>`}
+  for(let lat=33;lat<=38;lat++){let y=385-(lat-32)*53; svg+=`<path d="M35 ${y}H595" stroke="#dbe2ea"/><text x="12" y="${y}" font-size="10">${lat}°N</text>`}
+  svg += points.map((p,i)=>`<circle cx="${35+(p.lon-124)*70}" cy="${385-(p.lat-32)*53}" r="${points.length>500?1.8:3.8}" fill="#5078d5" opacity=".7"><title>${esc(p.name)} · ${esc(p.address)}</title></circle>`).join('');
+  svg += '</svg>'; $('stationMap').innerHTML = svg; $('mapDetails').textContent = (source||'자료 없음')+' · 좌표 '+points.length.toLocaleString()+'개';
+}
+
+async function loadResearch(){
+  const r = await api('/api/research');
+  const entries=Object.entries(r); $('researchBody').innerHTML = entries.length ? entries.map(([k,v])=>`<details style="margin:10px 0"><summary style="cursor:pointer">${esc(k)}</summary><pre style="white-space:pre-wrap;font:12px/1.55 'Courier New',monospace;background:#f7f8fb;border:1px solid var(--line);padding:12px;border-radius:12px">${esc(JSON.stringify(v,null,2))}</pre></details>`).join('') : '<p class="section-desc">요약 파일이 없습니다.</p>';
+}
+
+function homeCost(){
+  const e=+$('homeEff').value, k=+$('homeKm').value, p=+$('homePrice').value, i=+$('homeInc').value;
+  $('homeIncLabel').textContent=i+'%'; if(!(e>0 && k>=0 && p>=0)) return;
+  const base=k/e*p, extra=base*i/100, liters=k/e*i/100; $('homeExtra').textContent=num(extra,0)+'원'; $('homeAnnual').textContent='연간 '+num(extra*12,0)+'원 · 월 추가 연료 '+num(liters,1)+'L'; $('costFill').style.width=Math.min(100,60+i)+'%'; $('costBars').innerHTML=`<p>평소 월 연료비 ${num(base,0)}원</p><p>증가 후 월 연료비 ${num(base+extra,0)}원</p>`;
+}
+['homeKm','homeEff','homePrice','homeInc'].forEach(id=>$(id).oninput=homeCost);
+$('homeRegions').onchange=()=>{ if($('homeRegions').value) $('homePrice').value=$('homeRegions').value; homeCost(); };
+api('/api/prices').then(rows=>{ const date=rows.map(x=>x['구분']).sort().at(-1); rows.filter(x=>x['구분']===date).forEach(x=>{ const p=+x['보통휘발유']; if(p>0) $('homeRegions').append(new Option((x['지역']||'')+' · '+date+' · '+num(p,0)+'원/L', p));}); }).catch(()=>{});
+$('vehicleSelect').onchange=()=>{selectedVehicle=+$('vehicleSelect').value;$('reportVehicle').value=selectedVehicle;refreshRefills()};$('reportVehicle').onchange=()=>{selectedVehicle=+$('reportVehicle').value;$('vehicleSelect').value=selectedVehicle;refreshReport()};
+$('photo').addEventListener('change',()=>{const f=$('photo').files[0]; const img=$('ocrPreview');if(img.dataset.url)URL.revokeObjectURL(img.dataset.url);img.hidden=!f;if(f){img.dataset.url=URL.createObjectURL(f);img.src=img.dataset.url;}});
+
+function openVehicle(sub){activatePage('vehicle');const t=document.querySelector('.sub[data-sub="'+sub+'"]');if(t)t.click()}
+function openPublic(kind){currentPublicKind=kind;activatePage('public');const t=document.querySelector('.pub[data-kind="'+kind+'"]');if(t)t.click()}
+let carRows=[];let searchSeq=0;
+function exampleCar(q){$('carSearch').value=q;searchCars()}
+async function searchCars(){const q=$('carSearch').value.trim();if(!q)return;const seq=++searchSeq;const box=$('carResults');box.hidden=false;box.textContent='차량 정보를 찾고 있습니다…';try{const r=await api('/api/catalog/cars?q='+encodeURIComponent(q));if(seq!==searchSeq)return;carRows=r.rows;box.innerHTML='<h3>차량 검색 결과 · '+num(r.total,0)+'건</h3><p class="fineprint">한국에너지공단 자동차 표시연비 정보(2026.04.24). 동일 모델도 세부 사양에 따라 다릅니다. 원본 연비 수치의 단위와 유종을 확인하세요. 최대 80건 표시.</p>'+ (carRows.length?carRows.map((x,i)=>`<div class="car-result"><div><b>${esc(x['모델명']||'차량명 없음')}</b><p>${esc(x['제조(수입사)']||'')} · ${esc(x['차종']||'')} · ${esc(x['유형']||'')}</p><p>복합 표시연비 <strong>${esc(x['복합_연비']||'미제공')}</strong> · 도심 ${esc(x['도심_연비']||'–')} · 고속 ${esc(x['고속도로_연비']||'–')} ${x['1회충전주행거리']?' · 충전 주행거리 '+esc(x['1회충전주행거리']):''}</p></div><button class="secondary-btn" onclick="chooseCar(${i})">이 차량 등록 →</button></div>`).join(''):'<p>검색 결과가 없습니다. 다른 검색어를 사용하거나 직접 등록해 주세요.</p>');}catch(e){if(seq===searchSeq)box.textContent='검색 실패: '+e.message}}
+$('carSearchForm').onsubmit=e=>{e.preventDefault();searchCars()};
+function chooseCar(i){const r=carRows[i];if(!r)return;openVehicle('v1');$('vname').value=r['모델명']||'';$('vyear').value='';$('vdisp').value='';$('veff').value='';$('vfuel').value='other';$('vehicleMsg').textContent='선택한 차량의 원본 복합연비: '+(r['복합_연비']||'미제공')+' · 연비 단위(km/L), 연식, 배기량, 유종을 확인한 뒤 직접 입력하세요. 전기차 등은 연료 AI 적용 대상이 아닙니다.';$('vname').focus()}
+
+modelReady.then(m=>{$('modelAvailability').textContent=m?'학습 모델 연결됨 · 실험적 참고 예측':'학습 모델 미연결 · 실제 연비 계산만 제공 (AI 예상값 및 경보는 제공하지 않음)'}); setNow(); homeCost(); loadVisuals(); activatePage('home'); refreshVehicles().catch(()=>{});
+</script>
+</body></html>
